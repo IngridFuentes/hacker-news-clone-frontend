@@ -33,7 +33,7 @@ const Submit = () => {
             </div>
             <br/>
             <Link to="/newest">
-            <button>Submit</button>
+                <button>Submit</button>
             </Link>
         </form>
         </div>

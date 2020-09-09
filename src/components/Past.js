@@ -3,7 +3,7 @@ import React from 'react';
 const Past = () => {
 
     return(
-        <div> PAST NEWSSSSSS</div>
+        <div> PAST NEWS</div>
     )
 }
 

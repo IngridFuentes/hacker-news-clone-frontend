@@ -1,8 +1,7 @@
 import React, { Component } from 'react'; 
-import Submit from './Submit';
+// import Submit from './Submit';
 import { Link } from 'react-router-dom';
-// import LoginForm from '/components/LoginForm.js'; 
-// import '/LoginPage.css'; 
+
 
 class Login extends Component { 
 
@@ -23,7 +22,7 @@ class Login extends Component {
                     <input type="password" placeholder="Password"/> <br/>
                     <br/>
                     <Link to="/news">
-                    <button type="submit">Login</button>
+                        <button type="submit">Login</button>
                     </Link>
                 </form>
                 <br/>
@@ -38,7 +37,7 @@ class Login extends Component {
                     <input type="password" placeholder="Create Password"/> <br/>
                     <br/>
                     <Link to="/news">
-                    <button type="submit">Sign up</button>
+                        <button type="submit">Sign up</button>
                     </Link>
                     </form>
                 </div>
