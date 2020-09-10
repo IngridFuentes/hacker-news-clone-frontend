@@ -19,7 +19,7 @@ exports.verifyUpVote = functions.https.onCall( async (data, context) => {
     const postTitle = data.postTitle;
 
     // query post document with the same title as postTitle.
-    let querySnapShot = await admin.firestore().collection('Posts').where('title', '==', postTitle).get();
+    let querySnapShot = await admin.firestore().collection('posts').where('title', '==', postTitle).get();
     let storyDocID = '';
     querySnapShot.forEach( doc => {
         storyDocID = doc.id;
@@ -27,7 +27,7 @@ exports.verifyUpVote = functions.https.onCall( async (data, context) => {
     });
 
     // get the user using userID
-    const doc = await admin.firestore().collection('Users').doc(userID).get();
+    const doc = await admin.firestore().collection('users').doc(userID).get();
 
     // if likedPost contains postID return true, else false.
     if(doc.data().likedPosts.includes(storyDocID)){
@@ -44,8 +44,8 @@ exports.updateUpVote = functions.https.onCall( async (data, context) => {
     const method = data.method;
 
     // get document for user, get all the fields from the document.
-    const userDocument = await admin.firestore().collection('Users').doc(userID).get();
-    const userDoc = await admin.firestore().collection('Users').doc(userID);
+    const userDocument = await admin.firestore().collection('users').doc(userID).get();
+    const userDoc = await admin.firestore().collection('users').doc(userID);
 
     // get likedPosts array.
     let userLikedPosts = userDocument.data().likedPosts;
@@ -53,7 +53,7 @@ exports.updateUpVote = functions.https.onCall( async (data, context) => {
 
         // query Posts collection to gather all documents that have field title equal to postTitle.
         let storyDocID = '';
-        let querySnapShot = await admin.firestore().collection('Posts').where('title', '==', postTitle).get();
+        let querySnapShot = await admin.firestore().collection('posts').where('title', '==', postTitle).get();
 
         // should only loop once and so we push the post ID onto likedPost
         querySnapShot.forEach( doc => {
@@ -62,7 +62,7 @@ exports.updateUpVote = functions.https.onCall( async (data, context) => {
         });
 
         // get post document using postID, 
-        const storyDoc = await admin.firestore().collection('Posts').doc(storyDocID);
+        const storyDoc = await admin.firestore().collection('posts').doc(storyDocID);
 
         // update upvote count and likedPosts.
         await storyDoc.update({
@@ -74,7 +74,7 @@ exports.updateUpVote = functions.https.onCall( async (data, context) => {
         
     } else if(method === 'decrement'){
         // query the Posts collection to gather all documents that have field title equal to postTitle.
-        let querySnapShot = await admin.firestore().collection('Posts').where('title', '==', postTitle).get();
+        let querySnapShot = await admin.firestore().collection('posts').where('title', '==', postTitle).get();
         let storyDocID = '';
 
         // should only get one document back so we just loop this once.
@@ -93,7 +93,7 @@ exports.updateUpVote = functions.https.onCall( async (data, context) => {
         }
 
         // get the document using the ID for updating.
-        const storyDoc = await admin.firestore().collection('Posts').doc(storyDocID);
+        const storyDoc = await admin.firestore().collection('posts').doc(storyDocID);
 
         // remove post from the array.
         userLikedPosts.splice(postIndex, 1);
