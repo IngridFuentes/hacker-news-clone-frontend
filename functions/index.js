@@ -563,3 +563,31 @@ exports.editComment = functions.https.onCall(async (data, context) => {
 })
 
 
+// will return array of objects of all comments belonging to post
+// Takes post title as argument
+exports.getComments = functions.https.onCall(async (data, context) =>{
+    const post = data.post;
+
+    const postSnapshot = await admin.firestore().collection('posts').where("title","==",post).limit(1).get();
+
+    var comments = [];
+    var postID = "";
+
+    // find post id given post title
+    postSnapshot.forEach(doc => {
+        postID = doc.id;
+    })
+
+    // query comment selection where post = postID
+    const commentSnapshot = await admin.firestore().collection('comments').where('post','==',postID).get();
+    if (commentSnapshot.empty){
+        functions.logger.log("No comments found for postID: ", postID);
+    }
+    commentSnapshot.forEach(doc=>{
+        comment = doc.data();
+        comments.push(comment);
+    })
+
+    //returns array of comment objets {text, time, post, user}
+    return comments;
+})
