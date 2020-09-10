@@ -563,7 +563,7 @@ exports.editComment = functions.https.onCall(async (data, context) => {
 })
 
 
-// will return array of objects of all comments belonging to post
+// will return object of all comments belonging to post
 // Takes post title as argument
 exports.getComments = functions.https.onCall(async (data, context) =>{
     const post = data.post;
@@ -579,15 +579,40 @@ exports.getComments = functions.https.onCall(async (data, context) =>{
     })
 
     // query comment selection where post = postID
-    const commentSnapshot = await admin.firestore().collection('comments').where('post','==',postID).get();
+    const commentSnapshot = await admin.firestore().collection('comments')
+    .where('post','==',postID)
+    .get();
+    
     if (commentSnapshot.empty){
         functions.logger.log("No comments found for postID: ", postID);
     }
     commentSnapshot.forEach(doc=>{
-        comment = doc.data();
+        var comment = doc.data();
         comments.push(comment);
     })
 
+    //returns JSON string of comment objects {text, time, post, user}
+    return JSON.stringify(comments);
+})
+
+
+//will return array of all posts
+exports.getPosts = functions.https.onCall(async (data, context) =>{
+
+    var posts = [];
+
+    const postSnapShot = await admin.firestore().collection('posts').get();
+
+    if (postSnapShot.empty){
+        functions.logger.log("No posts found");
+    }
+    
+    postSnapShot.forEach(doc=>{
+
+        var post = doc.data();
+        posts.push(post);
+    })
+    
     //returns array of comment objets {text, time, post, user}
-    return comments;
+    return JSON.stringify(posts);
 })
