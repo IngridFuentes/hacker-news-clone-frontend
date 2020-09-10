@@ -108,3 +108,42 @@ exports.updateUpVote = functions.https.onCall( async (data, context) => {
     }
     return `true`;
 });
+
+
+//signup
+exports.register = functions.https.onCall(async (data, context) => {
+    const email = data.email;
+    const password = data.password;
+    const username = data.username;
+    var status = "";
+
+    //check if username exists before creating a new user
+    const snapshot = await admin.firestore().collection('users').doc(username).get();
+    if (snapshot.exists) {
+        functions.logger.log("User exists");
+        status = "User exists";
+    } else {
+        functions.logger.log("Creating user now");
+
+        //creates user
+        const cred = await admin.auth().createUser({
+            email: email,
+            password: password,
+            displayName: username
+        });
+
+        const user = await admin.firestore().collection('users').doc(username).set({
+            likedPosts: [],
+            posts: [],
+        });
+
+        status = "User added successfully";
+
+        return {
+            status: status,
+            user: cred
+        };
+    }
+
+    return {status: status};
+})
