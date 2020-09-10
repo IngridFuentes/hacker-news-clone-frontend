@@ -75,8 +75,8 @@ loginForm.addEventListener('submit', (e) => {
 
 //takes text post and username
 //An example of how to use add comment function
-const addComment = document.querySelector('#comment-form');
-addComment.addEventListener('submit', (e) => {
+const commentForm = document.querySelector('#comment-form');
+commentForm.addEventListener('submit', (e) => {
     //gets current user
     var user = firebase.auth().currentUser;
     if(user){
@@ -88,6 +88,7 @@ addComment.addEventListener('submit', (e) => {
             post: post,
             username: user.displayName
         };
+
         //calls cloud function for adding comment
         var addComment = firebase.functions().httpsCallable('addComment');
         addComment(data)
@@ -106,5 +107,68 @@ addComment.addEventListener('submit', (e) => {
         // user does not exist so they are not signed in
         console.log("Not signed in");
         return {status: "Must be signed in to add comment"};
+    }
+})
+
+
+//delete comment
+const deleteComment = document.querySelector('#delete-comment');
+deleteComment.addEventListener('click', (e) => {
+    e.preventDefault();
+    //gets current user
+    var user = firebase.auth().currentUser;
+    if(user){
+        //comment ID must be passed to this function!
+        //username must be passed to function to make sure user is only deleting their own comment
+        data = {
+            commentID: "yzd17AdIQPRlHERerdUO",
+            username: user.displayName
+        }
+
+        //cloud function is called here
+        //passing data object holding comment ID
+        var deleteComment = firebase.functions().httpsCallable('deleteComment');
+        deleteComment(data)
+        .then((status)=>{
+            console.log("Comment delete status: ", status.data);
+        })
+        .catch(error=>{
+            console.log("Error when deleting comment: ",error);
+        })
+    }
+    else{
+        console.log("User is not logged in");
+    }
+})
+
+//edit comment
+const editForm = document.querySelector('#comment-edit-form');
+editForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+     //gets current user
+     var user = firebase.auth().currentUser;
+     if(user){
+        // get user info
+        const text = editForm['comment-edit'].value;
+        const data = {
+            text: text,
+            username: user.displayName,
+            commentID: "phjnTaregjMfVoNWaB6s" // IMPORTANT: Must be changed to actual comment ID in db
+        };
+
+        //cloud function is called here
+        var editComment = firebase.functions().httpsCallable('editComment');
+        editComment(data)
+        .then(status => {
+            console.log(status);
+            return status;
+        })
+        .catch(error =>{
+            console.log("Error when editing comment: ", error);
+        })
+    }
+    else{
+        console.log("User is not logged in");
     }
 })
