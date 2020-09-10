@@ -309,3 +309,57 @@ exports.register = functions.https.onCall(async (data, context) => {
 
     return {status: status};
 })
+
+
+
+// creates comment
+// gets passed username, text and post title
+exports.addComment = functions.https.onCall(async (data, context) => {
+        
+    const text = data.text;
+    const time = admin.firestore.FieldValue.serverTimestamp();
+    const post = data.post;
+    var username = "/user/"
+    username += data.username;
+    var status = false;
+
+    //update comments db with comment and text
+    const comment = await admin.firestore().collection('comments').add({
+        user: username,
+        text: text,
+        time: time
+    })
+    
+    //get post from post title    
+    snapshot = await admin.firestore().collection('posts').where("title","==",post).get();
+
+    //if snapshot is empty, post does not exist
+    if(snapshot.empty){
+        return false;
+    } 
+    else{
+        //update post db to add comment to list of comments
+        snapshot.forEach(async doc => { 
+
+            data = doc.data();
+            c = data.comments; //comment array
+
+            //increment number of comments on post
+            num = data.numComments;
+            num +=1;
+            
+            // push comment id onto array "/comments/{commentID}"
+            ref = "/comments/";
+            ref += comment.id;
+            c.push(ref);
+            
+            //update document in post db
+            await admin.firestore().collection('posts').doc(doc.id).update({comments: c, numComments: num});
+            functions.logger.log("Updated post db with new comment");
+            status = true;
+        });
+
+        return true;
+    }
+})
+
