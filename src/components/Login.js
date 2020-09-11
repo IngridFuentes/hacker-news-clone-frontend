@@ -1,8 +1,10 @@
 import React, { Component, useDebugValue } from 'react'; 
 // import Submit from './Submit';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import firebase from 'firebase'
 import db from 'firebase'
+
+
 
 class Login extends Component { 
 
@@ -22,6 +24,7 @@ class Login extends Component {
           signupEmail: '',
           signupPassword: '',
           signupUsername: '',
+          redirect: false
         };
       }
 
@@ -42,7 +45,7 @@ class Login extends Component {
         firebase.auth().signInWithEmailAndPassword(email, password)
         .then(cred =>{
             console.log(cred);
-            return {status: "login successful"};
+            this.setState({redirect: true});
         })
         .catch(error=>{
             console.log("Error while logging in: ",error );
@@ -55,7 +58,6 @@ class Login extends Component {
       onSubmitSignup = (e) => {
         e.preventDefault();
         // get our form data out of state
-       
         // get user info from signup form
         const data = {
             email: this.state.signupEmail,
@@ -63,8 +65,8 @@ class Login extends Component {
             username: this.state.signupUsername,
         };
         console.log(data);
+
         //calls cloud function here
-        
         var register = firebase.functions().httpsCallable('register');
         register(data).then(status => {
             console.log(status);
@@ -73,17 +75,28 @@ class Login extends Component {
                 var x = document.getElementById('Signup-Error');
                 x.innerHTML = '<p style="color:#FF0000";>Username already exists</p>';
             }
-            return status;
+            else{
+                firebase.auth().signInWithEmailAndPassword(data.email, data.password)
+                .then(cred =>{
+                    console.log(cred);
+                    this.setState({redirect: true});
+                });
+                console.log("Registration successful");
+            }
         })
         .catch(error =>{
             console.error("Error while registering user: ", error);
             var x = document.getElementById('Signup-Error');
             x.innerHTML = '<p style="color:#FF0000";>Email already exists</p>';
         })
-        
       }
 
-
+      //redirects to home page if successful login
+      renderRedirect = () => {
+        if (this.state.redirect) {
+          return <Redirect to='/' />
+        }
+      }
 
     render() { 
         const {email, password} = this.state;
@@ -96,10 +109,9 @@ class Login extends Component {
                     <br/>
                     <input type="password" name="password" value={this.state.password} onChange={this.handleChange} placeholder="Password"/> <br/>
                     <br/>
-                    {/*<Link to="/news">*/}
                         <button type="submit">Login</button>
                         <div id="Login-Error"></div>
-                    {/*</Link>*/}
+                        {this.renderRedirect()}
                 </form>
                 <br/>
                 <div> Or Create an account
@@ -112,9 +124,7 @@ class Login extends Component {
                     <br/>
                     <input type="password" name="signupPassword" value={this.state.signupPassword} onChange={this.handleChange} placeholder="Create Password"/> <br/>
                     <br/>
-                    {/*<Link to="/news">*/}
                         <button type="submit">Sign up</button>
-                    {/*</Link>*/}
                     <div id="Signup-Error"></div>
                      </form>
                 </div>
