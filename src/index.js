@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter as Router } from 'react-router-dom';
-// import firebase from 'firebase';
+ import firebase from 'firebase';
 // import db from './firebase';
 
 ReactDOM.render(
@@ -27,27 +27,31 @@ const db = firebase.firestore();
 //signup
 //here is an example of how to use the signup function
 const signupForm = document.querySelector('#signup-form');
-signupForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    // get user info from signup form
-    const email = signupForm['signup-email'].value;
-    const password = signupForm['signup-password'].value;
-    const username = signupForm['signup-username'].value;
-    const data = {
-        email: email,
-        password: password,
-        username: username,
-    };
-
-    //calls cloud function here
-    var register = firebase.functions().httpsCallable('register');
-    register(data).then(status => {
-        console.log(status);
-        return status;
+if(signupForm){
+    signupForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+    
+        // get user info from signup form
+        const email = signupForm['signup-email'].value;
+        const password = signupForm['signup-password'].value;
+        const username = signupForm['signup-username'].value;
+        const data = {
+            email: email,
+            password: password,
+            username: username,
+        };
+    
+        //calls cloud function here
+        var register = firebase.functions().httpsCallable('register');
+        register(data).then(status => {
+            console.log(status);
+            return status;
+        })
     })
-})
+}
 
+
+/*
 //logout
 //an example of how to use the logout function
 const logout = document.querySelector('#logout');
@@ -73,6 +77,8 @@ loginForm.addEventListener('submit', (e) => {
     })
 })
 
+*/
+/*
 
 //takes text post and username
 //An example of how to use add comment function
@@ -84,7 +90,7 @@ commentForm.addEventListener('submit', (e) => {
         const text = addComment['comment-text'].value;
         //IMPORTANT: post must be changed to the actual title of the posts
         const post = "Title of Post";
-        data={
+        var data={
             text: text,
             post: post,
             username: user.displayName
@@ -121,7 +127,7 @@ deleteComment.addEventListener('click', (e) => {
     if(user){
         //comment ID must be passed to this function!
         //username must be passed to function to make sure user is only deleting their own comment
-        data = {
+        var data = {
             commentID: "yzd17AdIQPRlHERerdUO",
             username: user.displayName
         }
@@ -178,7 +184,7 @@ editForm.addEventListener('submit', (e) => {
 const getCommentList = document.querySelector('#get-comments');
 getCommentList.addEventListener('click', (e) => {
     e.preventDefault();
-    data = {
+    var data = {
         post: "Another Post",
     }
 
@@ -215,3 +221,5 @@ getPostList.addEventListener('click', (e) => {
     })
 
 })
+
+*/
