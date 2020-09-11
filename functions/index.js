@@ -1,6 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-admin.initializeApp();
+admin.initializeApp(functions.config().firebase);
 const FieldValue = admin.firestore.FieldValue;
 const { firebaseConfig } = require('firebase-functions');
 
@@ -12,6 +12,13 @@ const { firebaseConfig } = require('firebase-functions');
 //   response.send("Hello from Firebase!");
 // });
 
+// const functions = require('firebase-functions');
+
+exports.returnMessage = functions.https.onCall((data, context) => {
+    return {
+        output: "the firebase function has been run"
+      }
+});
 
 // edit post, takes in userID, old postTitle, new postTitle.
 // if old postTitle is not in db, return false,

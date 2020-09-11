@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import Home from './components/Home.js';
 import { Route, Switch } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -7,11 +7,14 @@ import Past from './components/Past.js';
 import Comments from './components/Comments.js';
 import Submit from './components/Submit.js';
 import Login from './components/Login.js';
+import db from './firebase';
+import React, { useState, useEffect } from 'react';
+// import * as firebase from "./firebase";
 // import fire from './fire';
 // import "bootstrap/dist/css/bootstrap.min.css";
 import './App.css';
 
-class App extends React.Component {
+// class App extends React.Component {
   // componentWillMount(){
   //   /* Create reference to messages in Firebase Database */
   //   let messagesRef = fire.database().ref('messages').orderByKey().limitToLast(100);
@@ -21,25 +24,47 @@ class App extends React.Component {
   //     this.setState({ messages: [message].concat(this.state.messages) });
   //   })
   // } 
-  render() {
+  function App() {
+
+  const [comments, setComments] = useState([]);
+  // const [ input, setInput] = useState('');
+
+  useEffect(() => {
+    db.collection('comments').onSnapshot( snapshot =>{
+      console.log(setComments(snapshot.docs.map(doc => doc.data().post)));
+      setComments(snapshot.docs.map(doc => doc.data().post))
+    })
+  }, []);
+
+  // const addComment = (event) => {
+  //   event.preventDefault();
+  // } 
+
   return (
     <div>
-      
-      <Navbar/>
-      <Switch>
-    
-       {/* <Route exact path="/" component={Home} /> */}
-       <Route exact path="/news" component={Home} />
-       <Route exact path="/newest" component={New} />
-       <Route exact path="/past" component={Past} />
-       <Route exact path="/newcomments" component={Comments} />
-       <Route exact path="/submit" component={Submit} />
-       <Route exact path="/login" component={Login} />
-       </Switch>
-
+     Hello world 
     </div>
-   
   );
+
+  // render() {
+  // return (
+  //   <div>
+      
+  //     <Navbar/>
+  //     <Switch>
+    
+  //      {/* <Route exact path="/" component={Home} /> */}
+  //      <Route exact path="/news" component={Home} />
+  //      <Route exact path="/newest" component={New} />
+  //      <Route exact path="/past" component={Past} />
+  //      <Route exact path="/newcomments" component={Comments} />
+  //      <Route exact path="/submit" component={Submit} />
+  //      <Route exact path="/login" component={Login} />
+  //      </Switch>
+
+  //   </div>
+   
+  // );
   }
   
   // <body>
@@ -53,6 +78,6 @@ class App extends React.Component {
   //         <script src="/__/firebase/init.js"></script>
   // </body>
 
-}
+// }
 
 export default App;
