@@ -601,7 +601,7 @@ exports.getPosts = functions.https.onCall(async (data, context) =>{
 
     var posts = [];
 
-    const postSnapShot = await admin.firestore().collection('posts').orderBy('time').get();
+    const postSnapShot = await admin.firestore().collection('posts').orderBy('time','desc').get();
 
     if (postSnapShot.empty){
         functions.logger.log("No posts found");
