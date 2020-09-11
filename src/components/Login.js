@@ -46,6 +46,8 @@ class Login extends Component {
         })
         .catch(error=>{
             console.log("Error while logging in: ",error );
+            var x = document.getElementById('Login-Error');
+            x.innerHTML = '<p style="color:#FF0000";>Invalid Email or Password</p>';
         })
       }
       
@@ -66,7 +68,17 @@ class Login extends Component {
         var register = firebase.functions().httpsCallable('register');
         register(data).then(status => {
             console.log(status);
+            if(status.data.status === "User exists"){
+                console.log("Username already exists");
+                var x = document.getElementById('Signup-Error');
+                x.innerHTML = '<p style="color:#FF0000";>Username already exists</p>';
+            }
             return status;
+        })
+        .catch(error =>{
+            console.error("Error while registering user: ", error);
+            var x = document.getElementById('Signup-Error');
+            x.innerHTML = '<p style="color:#FF0000";>Email already exists</p>';
         })
         
       }
@@ -86,6 +98,7 @@ class Login extends Component {
                     <br/>
                     {/*<Link to="/news">*/}
                         <button type="submit">Login</button>
+                        <div id="Login-Error"></div>
                     {/*</Link>*/}
                 </form>
                 <br/>
@@ -102,6 +115,7 @@ class Login extends Component {
                     {/*<Link to="/news">*/}
                         <button type="submit">Sign up</button>
                     {/*</Link>*/}
+                    <div id="Signup-Error"></div>
                      </form>
                 </div>
             </div>
