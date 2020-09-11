@@ -172,3 +172,46 @@ editForm.addEventListener('submit', (e) => {
         console.log("User is not logged in");
     }
 })
+
+
+//get comments
+const getCommentList = document.querySelector('#get-comments');
+getCommentList.addEventListener('click', (e) => {
+    e.preventDefault();
+    data = {
+        post: "Another Post",
+    }
+
+    //cloud function is called here
+    //passing data object holding post title
+    var getComments = firebase.functions().httpsCallable('getComments');
+    getComments(data)
+    .then((status)=>{
+        //status.data contains string of comments beloning to the post
+        console.log("Comment array: ", status.data);
+    })
+    .catch(error=>{
+        console.log("Error when deleting comment: ",error);
+    })
+
+})
+
+
+//get posts
+const getPostList = document.querySelector('#get-posts');
+getPostList.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    //cloud function is called here
+    //passing data object holding post title
+    var getPosts= firebase.functions().httpsCallable('getPosts');
+    getPosts()
+    .then((status)=>{
+        //status.data contains JSON string of post objects
+        console.log("Post array: ", status.data); 
+    })
+    .catch(error=>{
+        console.log("Error when getting post list: ",error);
+    })
+
+})
