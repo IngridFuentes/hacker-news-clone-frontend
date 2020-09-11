@@ -329,13 +329,6 @@ exports.addComment = functions.https.onCall(async (data, context) => {
     var username = "/user/"
     username += data.username;
     var status = false;
-
-    //update comments db with comment and text
-    const comment = await admin.firestore().collection('comments').add({
-        user: username,
-        text: text,
-        time: time
-    })
     
     //get post from post title    
     snapshot = await admin.firestore().collection('posts').where("title","==",post).get();
@@ -349,6 +342,15 @@ exports.addComment = functions.https.onCall(async (data, context) => {
         snapshot.forEach(async doc => { 
 
             data = doc.data();
+
+            //update comments db with comment and text
+            const comment = await admin.firestore().collection('comments').add({
+                user: username,
+                text: text,
+                time: time,
+                post: doc.id
+            })
+
             c = data.comments; //comment array
 
             //increment number of comments on post
@@ -370,3 +372,254 @@ exports.addComment = functions.https.onCall(async (data, context) => {
     }
 })
 
+
+//delete comment
+//takes commentID and deletes comment from comment db
+//deletes comment from array in post db
+exports.deleteComment = functions.https.onCall(async (data, context) => {
+var commentID = "/comments/"
+commentID += data.commentID;
+
+//find post with comment id
+const snapshot = await admin.firestore().collection('posts').where("comments","array-contains",commentID).get();
+
+snapshot.forEach(async doc =>{
+    functions.logger.log("Found comment reference in posts db");
+
+    commentArray = doc.data().comments;
+    numComments = doc.data().numComments;
+    numComments -=1;
+    //delete comment from array
+    for(let i = 0; i < commentArray.length; i++){
+        if(commentID === commentArray[i]){
+            commentArray.splice(i,1);
+            break;
+        }
+    }
+    //update post db with new comment array
+    await admin.firestore().collection('posts').doc(doc.id).update({
+        comments: commentArray,
+        numComments: numComments,
+    });
+});
+
+await admin.firestore().collection('comments').doc(data.commentID).delete()
+.then(()=>{
+    functions.logger.log("Comment deleted successfully");
+    return true;
+})
+.catch(error =>{
+    functions.logger.log("Error deleting comment: ", error);
+})
+})
+
+
+// edit comment
+//takes commentID and text to update comment in db
+exports.editComment = functions.https.onCall(async (data, context) => {
+const commentID = data.commentID;
+const text = data.text;
+const time = admin.firestore.FieldValue.serverTimestamp();
+
+if(text === ""){
+    return false; //trying to update with the empty string
+}
+else{
+    await admin.firestore().collection('comments').doc(commentID).update({
+        text: text,
+        time: time,
+    });
+    return true; //comment edited successfully
+}
+})
+
+
+
+// creates comment
+// gets passed username, text and post title
+exports.addComment = functions.https.onCall(async (data, context) => {
+        
+        const text = data.text;
+        const time = admin.firestore.FieldValue.serverTimestamp();
+        const post = data.post;
+        var username = "/user/"
+        username += data.username;
+        var status = false;
+        
+        //get post from post title    
+        snapshot = await admin.firestore().collection('posts').where("title","==",post).get();
+
+        //if snapshot is empty, post does not exist
+        if(snapshot.empty){
+            return false;
+        } 
+        else{
+            //update post db to add comment to list of comments
+            snapshot.forEach(async doc => { 
+
+                data = doc.data();
+
+                //update comments db with comment and text
+                const comment = await admin.firestore().collection('comments').add({
+                    user: username,
+                    text: text,
+                    time: time,
+                    post: doc.id
+                })
+
+                c = data.comments; //comment array
+
+                //increment number of comments on post
+                num = data.numComments;
+                num +=1;
+                
+                // push comment id onto array "/comments/{commentID}"
+                ref = "/comments/";
+                ref += comment.id;
+                c.push(ref);
+                
+                //update document in post db
+                await admin.firestore().collection('posts').doc(doc.id).update({comments: c, numComments: num});
+                functions.logger.log("Updated post db with new comment");
+                status = true;
+            });
+
+            return true;
+        }
+})
+
+
+//delete comment
+//takes commentID and username and deletes comment from comment db
+//deletes comment from array in post db
+exports.deleteComment = functions.https.onCall(async (data, context) => {
+    var commentID = "/comments/"
+    commentID += data.commentID;
+    const username = data.username;
+
+    //confirm user is the owner of the comment
+    const commentSnapshot = await admin.firestore().collection('comments').doc(data.commentID).get();
+    const commentOwner = commentSnapshot.data().user;
+    if(commentOwner !== username){
+        return "Comment does not belog to user";
+    }
+
+
+    //delete comment
+    await admin.firestore().collection('comments').doc(data.commentID).delete()
+    .then(()=>{
+        functions.logger.log("Comment deleted successfully");
+        return true;
+    })
+    .catch(error =>{
+        functions.logger.log("Error deleting comment: ", error);
+    })
+    
+    //find post with comment id
+    const snapshot = await admin.firestore().collection('posts').where("comments","array-contains",commentID).get();
+    snapshot.forEach(async doc =>{
+        functions.logger.log("Found comment reference in posts db");
+
+        commentArray = doc.data().comments;
+        numComments = doc.data().numComments;
+        numComments -=1;
+        //delete comment from array
+        for(let i = 0; i < commentArray.length; i++){
+            if(commentID === commentArray[i]){
+                commentArray.splice(i,1);
+                break;
+            }
+        }
+        //update post db with new comment array
+        await admin.firestore().collection('posts').doc(doc.id).update({
+            comments: commentArray,
+            numComments: numComments,
+        });
+    });
+
+    return "Success";
+    
+})
+
+// edit comment
+//takes commentID, username, and text to update comment in db
+exports.editComment = functions.https.onCall(async (data, context) => {
+    const commentID = data.commentID;
+    const text = data.text;
+    const time = admin.firestore.FieldValue.serverTimestamp();
+    const username = data.username;
+    
+    //confirm user is the owner of the comment
+    const commentSnapshot = await admin.firestore().collection('comments').doc(data.commentID).get();
+    const commentOwner = commentSnapshot.data().user;
+    if(commentOwner !== username){
+        return "Comment does not belog to user";
+    }
+
+
+    if(text === ""){
+        return false; //trying to update with the empty string
+    }
+    else{
+        await admin.firestore().collection('comments').doc(commentID).update({
+            text: text,
+            time: time,
+        });
+        return true; //comment edited successfully
+    }
+})
+
+
+// will return object of all comments belonging to post
+// Takes post title as argument
+exports.getComments = functions.https.onCall(async (data, context) =>{
+    const post = data.post;
+
+    const postSnapshot = await admin.firestore().collection('posts').where("title","==",post).limit(1).get();
+
+    var comments = [];
+    var postID = "";
+
+    // find post id given post title
+    postSnapshot.forEach(doc => {
+        postID = doc.id;
+    })
+
+    // query comment selection where post = postID
+    const commentSnapshot = await admin.firestore().collection('comments')
+    .where('post','==',postID)
+    .get();
+    
+    if (commentSnapshot.empty){
+        functions.logger.log("No comments found for postID: ", postID);
+    }
+    commentSnapshot.forEach(doc=>{
+        var comment = doc.data();
+        comments.push(comment);
+    })
+
+    //returns JSON string of comment objects {text, time, post, user}
+    return JSON.stringify(comments);
+})
+
+
+//will return array of all posts
+exports.getPosts = functions.https.onCall(async (data, context) =>{
+
+    var posts = [];
+
+    const postSnapShot = await admin.firestore().collection('posts').get();
+
+    if (postSnapShot.empty){
+        functions.logger.log("No posts found");
+    }
+    
+    postSnapShot.forEach(doc=>{
+
+        var post = doc.data();
+        posts.push(post);
+    })
+    
+    //returns array of comment objets {text, time, post, user}
+    return JSON.stringify(posts);
+})
