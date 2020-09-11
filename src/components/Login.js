@@ -37,6 +37,11 @@ class Login extends Component {
 
       onSubmit = (e) => {
         e.preventDefault();
+        
+        //Resets error message if there was one
+        var x = document.getElementById('Signup-Error');
+        x.innerHTML = '<p></p>';
+
         // get our form data out of state
         const email = this.state.email;
         const password = this.state.password;
@@ -51,12 +56,19 @@ class Login extends Component {
             console.log("Error while logging in: ",error );
             var x = document.getElementById('Login-Error');
             x.innerHTML = '<p style="color:#FF0000";>Invalid Email or Password</p>';
+            
+            
         })
       }
       
 
       onSubmitSignup = (e) => {
         e.preventDefault();
+        
+        // Resets error message if there was one
+        var x = document.getElementById('Login-Error');
+        x.innerHTML = '<p></p>';
+
         // get our form data out of state
         // get user info from signup form
         const data = {
@@ -72,7 +84,7 @@ class Login extends Component {
             console.log(status);
             if(status.data.status === "User exists"){
                 console.log("Username already exists");
-                var x = document.getElementById('Signup-Error');
+                x = document.getElementById('Signup-Error');
                 x.innerHTML = '<p style="color:#FF0000";>Username already exists</p>';
             }
             else{
