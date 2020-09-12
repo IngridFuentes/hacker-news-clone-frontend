@@ -73,44 +73,6 @@ loginForm.addEventListener('submit', (e) => {
     })
 })
 
-
-<<<<<<< HEAD
-// //takes text post and username
-// //An example of how to use add comment function
-// const addComment = document.querySelector('#comment-form');
-// addComment.addEventListener('submit', (e) => {
-//     //gets current user
-//     var user = firebase.auth().currentUser;
-//     if(user){
-//         const text = addComment['comment-text'].value;
-//         //IMPORTANT: post must be changed to the actual title of the posts
-//         const post = "Title of Post";
-//         data={
-//             text: text,
-//             post: post,
-//             username: user.displayName
-//         };
-//         //calls cloud function for adding comment
-//         var addComment = firebase.functions().httpsCallable('addComment');
-//         addComment(data)
-//         .then(status => {
-//             if(status.data == true){
-//                 console.log("Comment added successfully");
-//             } else{
-//                 console.log("Comment was not added");
-//             }
-//         })
-//         .catch(error=>{
-//             console.log("Error when adding comment ", error);
-//         })
-//     }
-//     else{
-//         // user does not exist so they are not signed in
-//         console.log("Not signed in");
-//         return {status: "Must be signed in to add comment"};
-//     }
-// })
-=======
 //takes text post and username
 //An example of how to use add comment function
 const commentForm = document.querySelector('#comment-form');
@@ -210,4 +172,3 @@ editForm.addEventListener('submit', (e) => {
         console.log("User is not logged in");
     }
 })
->>>>>>> 0af5f4d4b83049336d6bd28cf3feeae84b15bacc

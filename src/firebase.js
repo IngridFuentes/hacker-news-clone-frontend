@@ -1,4 +1,4 @@
-import firebase from './firebase';
+import firebase from 'firebase';
 // {/* <script> */}
   // Your web app's Firebase configuration
   const firebaseApp = firebase.initializeApp({
