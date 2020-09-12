@@ -1,4 +1,4 @@
-// import React from 'react';
+import React from 'react';
 import Home from './components/Home.js';
 import { Route, Switch } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -7,9 +7,11 @@ import Past from './components/Past.js';
 import Comments from './components/Comments.js';
 import Submit from './components/Submit.js';
 import Login from './components/Login.js';
+
 import db from './firebase';
-import React, { useState, useEffect } from 'react';
-// import * as firebase from "./firebase";
+// import React, { useState, useEffect } from 'react';
+import firebase from "firebase";
+
 // import fire from './fire';
 // import "bootstrap/dist/css/bootstrap.min.css";
 import './App.css';
@@ -24,49 +26,67 @@ import './App.css';
   //     this.setState({ messages: [message].concat(this.state.messages) });
   //   })
   // } 
+  
   function App() {
 
-  const [comments, setComments] = useState([]);
+  // const [posts, setPosts] = useState([]);
   // const [ input, setInput] = useState('');
 
+  // useEffect(() => {
+  //   //this code fires when the app.js loads
+  //   db.collection('posts').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+  //     // console.log(snapshot.docs.map(doc => doc.data().todo));
+  //     setPosts(snapshot.docs.map(doc =>({id: doc.id, post: doc.data().post })))
+  //   })
+  // }, []);
+  /*
   useEffect(() => {
     db.collection('comments').onSnapshot( snapshot =>{
       console.log(setComments(snapshot.docs.map(doc => doc.data().post)));
-      setComments(snapshot.docs.map(doc => doc.data().post))
+      setComments(snapshot.docs.map(doc => doc.data().post));
     })
   }, []);
-
+*/
   // const addComment = (event) => {
   //   event.preventDefault();
   // } 
 
+  /*
   return (
     <div>
      Hello world 
     </div>
   );
+  */
 
-  // render() {
-  // return (
-  //   <div>
+  //render(){
+    return(
+      <div>
+        <Navbar/>
+        <Switch>
+          {/*<!-- <Route exact path="/" component={Home} /> */}
+          <Route exact path="/news" component={Home} />
+          <Route exact path="/newest" component={New} />
+          <Route exact path="/past" component={Past} />
+          <Route exact path="/newcomments" component={Comments} />
+          <Route exact path="/submit" component={Submit} />
+          <Route exact path="/login" component={Login} />
+          </Switch>
       
-  //     <Navbar/>
-  //     <Switch>
-    
-  //      {/* <Route exact path="/" component={Home} /> */}
-  //      <Route exact path="/news" component={Home} />
-  //      <Route exact path="/newest" component={New} />
-  //      <Route exact path="/past" component={Past} />
-  //      <Route exact path="/newcomments" component={Comments} />
-  //      <Route exact path="/submit" component={Submit} />
-  //      <Route exact path="/login" component={Login} />
-  //      </Switch>
+    {/* <ul>
+          {posts.map( post => (
+            <New post={post} />
 
-  //   </div>
-   
-  // );
-  }
-  
+          ))}
+    </ul> */}
+    {/* <ul>
+                        {posts.map( function(data, index) {
+                              return <p key={index}>{data} </p>  
+                        
+                        })
+                        }
+                    </ul> */}
+  </div>
   // <body>
   //      <!-- The core Firebase JS SDK is always required and must be listed first -->
   //         <script src="/__/firebase/7.19.1/firebase-app.js"></script>
@@ -77,7 +97,7 @@ import './App.css';
   //         <!-- Initialize Firebase -->
   //         <script src="/__/firebase/init.js"></script>
   // </body>
-
-// }
+    )
+};
 
 export default App;
