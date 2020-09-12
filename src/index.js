@@ -4,8 +4,8 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter as Router } from 'react-router-dom';
- import firebase from 'firebase';
-// import db from './firebase';
+
+
 
 ReactDOM.render(
   <React.StrictMode>

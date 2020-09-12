@@ -517,7 +517,7 @@ exports.getPosts = functions.https.onCall(async (data, context) =>{
             upvotes: upvotes,
         };
         posts.push(data);
-    })
+    });
     
     //returns array of comment objets {text, time, post, user}
     return posts;

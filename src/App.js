@@ -1,4 +1,5 @@
-import React from 'react';
+// import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Home from './components/Home.js';
 import { Route, Switch } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -28,6 +29,7 @@ import './App.css';
   // } 
   
   function App() {
+    const [comments, setComments] = useState([]);
 
   // const [posts, setPosts] = useState([]);
   // const [ input, setInput] = useState('');

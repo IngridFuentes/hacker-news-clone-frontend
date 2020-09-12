@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import firebase from 'firebase';
-import auth from 'firebase';
+//import auth from 'firebase';
 import { render } from '@testing-library/react';
 
 class Submit extends Component { 
@@ -11,57 +11,76 @@ class Submit extends Component {
         this.state = {
           title: '',
           url: '',
+          redirect: false
         };
       }
     
+      handleChange = (event) => {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+        this.setState({ [name] : value})
+    }
+
+
+    onSubmit = (e) => {
+        e.preventDefault();
+        const user = firebase.auth().currentUser;
+
+        if (user){
+            const username = user.displayName;
+            const data = {
+                postTitle: this.state.title,
+                url: this.state.url,
+                userID: username 
+            };
+            console.log(data);
     
-    // onSubmitSignUp = (e) => {
-    //     e.preventDefault();
-    //     const user = firebase.auth().currentUser;
+            var verifyPost = firebase.functions().httpsCallable('verifyPost');
+            verifyPost(data)
+            .then(status => {
+                console.log(status);
 
-    //     if (user){
-    //         const username = user.displayName;
-    //     } else {
-    //         return "You must be logged in"
-    //     }
-
-    //     const data = {
-    //         title: this.state.title,
-    //         url: this.state.url,      
-    //     };
-    //     console.log(data);
-
-        // var verifyPost = firebase.functions().httpsCallable('verifyPost');
-        // verifyPost(data).then(status => {
-        //     console.log(status);
-        //     if(status.data.status === "User exists"){
-        //         console.log("Username already exists");
-        //         // x = document.getElementById('Signup-Error');
-        //         // x.innerHTML = '<p style="color:#FF0000";>Username already exists</p>';
-        //     }
-        //     else{
-        //         firebase.auth().signInWithEmailAndPassword(data.email, data.password)
-        //         .then(cred =>{
-        //             console.log(cred);
-        //             this.setState({redirect: true});
-        //         });
-        //         console.log("Registration successful");
-        //     }
-        // })
-    // }
+                if(status.data === "true"){
+                    this.setState({redirect: true});
+                }
+                else{
+                    console.log("Error while submitting a post");
+                    var x = document.getElementById('Submit-Error');
+                    x.innerHTML = '<p style="color:#FF0000";>Post Title already Exists</p>';
+                }
+                
+            })
+            .catch(error =>{
+                console.log("Error while submitting a post: ", error);
+            })
+        
+        } else {
+            return "You must be logged in";
+        }
+    }
     
+    renderRedirect = () => {
+        if (this.state.redirect) {
+          return <Redirect to='/' />
+        }
+      }
+
     render() {
     return(
         <div>
             <div>
                 <h1 className="submit">Submit</h1>
             </div>
-        <form>
+        <form onSubmit={this.onSubmit}>
             <div>
             <p>Title:</p>
                 <input
                 type="text"
                 id="title"
+                name="title"
+                value={this.state.title}
+                onChange={this.handleChange}
                 />
             </div>
             <div>
@@ -69,24 +88,20 @@ class Submit extends Component {
                 <input
                 type="text"
                 id="url"
-                />
-            </div>
-            <div>
-                <p>Text</p>
-                <input
-                type="text"
-                id="txtbox"
-                
+                name="url"
+                value={this.state.url}
+                onChange={this.handleChange}
                 />
             </div>
             <br/>
-            <Link to="/newest">
                 <button>Submit</button>
-            </Link>
+                {this.renderRedirect()}
         </form>
+        <div id="Submit-Error"></div>
         </div>
     )
     }
+// }
 }
 
 export default Submit;
