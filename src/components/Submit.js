@@ -26,7 +26,7 @@ class Submit extends Component {
     onSubmit = (e) => {
         e.preventDefault();
         const user = firebase.auth().currentUser;
-
+        console.log(user);
         if (user){
             const username = user.displayName;
             const data = {
@@ -56,7 +56,7 @@ class Submit extends Component {
             })
         
         } else {
-            return "You must be logged in";
+            alert('you must be signed in');
         }
     }
     

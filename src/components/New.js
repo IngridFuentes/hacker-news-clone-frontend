@@ -64,7 +64,8 @@ class New extends Component {
         var x = document.getElementById('posts');
             
         //add list object for each post
-        for(let i =0; i < posts.data.length;i++){
+
+        for(let i = 0; i < posts.data.length; i++){
             let post = posts.data[i];
             var title = post.title;
             var url = post.url;
@@ -83,10 +84,11 @@ class New extends Component {
             commentSnapshot.forEach(doc =>{
                 var comment = doc.data().text;
                 var commentOwner = doc.data().user;
-                commentHTML += `<li>Comment by ${commentOwner}: ${comment}</li>
-                `;
+                console.log(comment);
+                commentHTML += "<li>" + commentOwner+" | "+comment + "</li>";
             })
-            
+            console.log("Comments: ", commentHTML);
+
             var deleteHTML = '';
             if(username === owner){
                 deleteHTML = `<button class="delete" value="${title}">Delete Post</button>`;
@@ -99,7 +101,6 @@ class New extends Component {
                             ${deleteHTML}
                         </div>
                         <div><button id="${title}" class="vote" value="${title}">Like</button>${upvotes} points</div>
-                        
                         <ul>${commentHTML}</ul>
                         </li>
                     `;
@@ -108,10 +109,9 @@ class New extends Component {
             
         x.innerHTML = html;
 
+        //setup like button event handler
         var elements = document.getElementsByClassName("vote");
-        // console.log(elements)
         console.log("Length of elements on page: ",elements.length);
-
         for (var i = 0; i < elements.length; i++) {
             elements[i].addEventListener('click', async function(e){
                     const target = e.target;
@@ -122,7 +122,10 @@ class New extends Component {
                         userID: username,
                         postTitle: postTitle
                     };
-
+                    if(!username){
+                        alert('you must be signed in to like the post');
+                        return;
+                    }
                     let verify = await verifyUpVote(d);
 
                     if(verify.data === 'false'){
@@ -144,8 +147,10 @@ class New extends Component {
                     console.log("Liking post ",postTitle," by user: ",username);
             });
         }
+
+
+        //set up delete button even handlers
         var deleteButton = document.getElementsByClassName("delete");
-        // console.log(elements)
         console.log("Length of delete buttons on page: ", deleteButton.length);
 
         for (var i = 0; i < deleteButton.length; i++) {
