@@ -27,6 +27,10 @@ class New extends Component {
             this.setState({allPostsCalled: true});
         } 
     }
+    onSubmit = (e) =>{
+        e.preventDefault();
+        console.log("Made a comment");
+    }
 
     addHandlers = () => {
         
@@ -60,7 +64,8 @@ class New extends Component {
         var x = document.getElementById('posts');
             
         //add list object for each post
-        posts.data.forEach(async post=>{
+        for(let i =0; i < posts.data.length;i++){
+            let post = posts.data[i];
             var title = post.title;
             var url = post.url;
             var time = post.time;
@@ -73,43 +78,33 @@ class New extends Component {
             //var commentArray = await getComments({post: title});
             var commentHTML = "";
 
-            /*
-            firebase.firestore().collection('comments').where("post","==",postID).get().then(commentSnapshot=>{
-                commentSnapshot.forEach( doc =>{
-                    var comment = doc.data().text;
-                    var commentOwner = doc.data().user;
-                    console.log(comment);
-                    commentHTML += comment+" "+commentOwner;
-                });
-                console.log("Comments: ", commentHTML);
-            })
-            .catch(error =>{
-                console.log("Error for comments: ", error);
-            });
-            */
+            var commentSnapshot = await firebase.firestore().collection('comments').where("post","==",postID).get();
 
-            //var commentSnapshot = await firebase.firestore().collection('comments').where("post","==",postID).get();
-            // console.log(commentSnapshot)
-            /*
             commentSnapshot.forEach(doc =>{
                 var comment = doc.data().text;
                 var commentOwner = doc.data().user;
-                console.log(comment);
-                commentHTML += commentOwner+" | "+comment;
+                commentHTML += `<li>Comment by ${commentOwner}: ${comment}</li>
+                `;
             })
-            console.log("Comments: ", commentHTML);
-            */
+            
+            var deleteHTML = '';
+            if(username === owner){
+                deleteHTML = `<button class="delete" value="${title}">Delete Post</button>`;
+            }
+
             const li =`
                     <li>
                         <div><a href="${url}">
-                            ${title}</a>&ensp;- Post made by ${owner} - ${url} | ${numComments} comments
+                            ${title}</a>&ensp;- by ${owner} - ${url} | ${numComments} comments
+                            ${deleteHTML}
                         </div>
                         <div><button id="${title}" class="vote" value="${title}">Like</button>${upvotes} points</div>
-                        <ul><li>"${commentHTML}"</li></ul>
+                        
+                        <ul>${commentHTML}</ul>
                         </li>
                     `;
                 html += li;
-        })
+        }
             
         x.innerHTML = html;
 
@@ -149,8 +144,29 @@ class New extends Component {
                     console.log("Liking post ",postTitle," by user: ",username);
             });
         }
+        var deleteButton = document.getElementsByClassName("delete");
+        // console.log(elements)
+        console.log("Length of delete buttons on page: ", deleteButton.length);
+
+        for (var i = 0; i < deleteButton.length; i++) {
+            deleteButton[i].addEventListener('click', async function (e) {
+                const target = e.target;
+                const postTitle = target.value;
+                var deletePost = firebase.functions().httpsCallable('deletePost');
+                const d = {
+                    userID: username,
+                    postTitle: postTitle
+                };
+
+                let verify = await deletePost(d);
+
+                console.log("Deleting post ", postTitle, " by user: ", username);
+            });
+
+        }
+
         console.log(posts);
-    }
+        }
 
         render() {
             return(
@@ -158,7 +174,6 @@ class New extends Component {
                     
                 <ul id="posts"></ul>
                 {this.allPostsHandler()}
-                {this.addHandlers()}
                 </div>
                 )
         }
