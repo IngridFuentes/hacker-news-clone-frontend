@@ -507,6 +507,7 @@ exports.getPosts = functions.https.onCall(async (data, context) =>{
         var title = post.title;
         var upvotes = post.upvotes;
         var time = post.time;
+        var postID = doc.id;
 
         var data = {
             owner: owner,
@@ -515,9 +516,10 @@ exports.getPosts = functions.https.onCall(async (data, context) =>{
             title: title,
             time: time,
             upvotes: upvotes,
+            postID: postID
         };
         posts.push(data);
-    });
+    })
     
     //returns array of comment objets {text, time, post, user}
     return posts;
