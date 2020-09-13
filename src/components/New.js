@@ -128,7 +128,10 @@ class New extends Component {
                         userID: username,
                         postTitle: postTitle
                     };
-
+                    if(!username){
+                        alert('you must be signed in to like the post');
+                        return;
+                    }
                     let verify = await verifyUpVote(d);
 
                     if(verify.data === 'false'){
