@@ -60,7 +60,9 @@ class New extends Component {
         var x = document.getElementById('posts');
             
         //add list object for each post
-        posts.data.forEach(async post=>{
+        
+        for(let i = 0; i < posts.data.length; i++){
+            let post = posts.data[i];
             var title = post.title;
             var url = post.url;
             var time = post.time;
@@ -88,29 +90,28 @@ class New extends Component {
             });
             */
 
-            //var commentSnapshot = await firebase.firestore().collection('comments').where("post","==",postID).get();
-            // console.log(commentSnapshot)
-            /*
+            var commentSnapshot = await firebase.firestore().collection('comments').where("post","==",postID).get();
+            
             commentSnapshot.forEach(doc =>{
                 var comment = doc.data().text;
                 var commentOwner = doc.data().user;
                 console.log(comment);
-                commentHTML += commentOwner+" | "+comment;
+                commentHTML += "<li>" + commentOwner+" | "+comment + "</li>";
             })
             console.log("Comments: ", commentHTML);
-            */
+            
             const li =`
                     <li>
                         <div><a href="${url}">
                             ${title}</a>&ensp;- Post made by ${owner} - ${url} | ${numComments} comments
                         </div>
                         <div><button id="${title}" class="vote" value="${title}">Like</button>${upvotes} points</div>
-                        <ul><li>"${commentHTML}"</li></ul>
+                        <ul>${commentHTML}</ul>
                         </li>
                     `;
                 html += li;
-        })
-            
+        }
+
         x.innerHTML = html;
 
         var elements = document.getElementsByClassName("vote");
