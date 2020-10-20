@@ -66,11 +66,9 @@ import './App.css';
       <div>
         <Navbar/>
         <Switch>
-          {/*<!-- <Route exact path="/" component={Home} /> */}
-          <Route exact path="/news" component={Home} />
+          <Route exact path="/" component={New} />
+          <Route exact path="/new" component={New} />
           <Route exact path="/newest" component={New} />
-          <Route exact path="/past" component={Past} />
-          {/* <Route exact path="/newcomments" component={Comments} /> */}
           <Route exact path="/submit" component={Submit} />
           <Route exact path="/login" component={Login} />
           </Switch>
@@ -89,16 +87,7 @@ import './App.css';
                         }
                     </ul> */}
   </div>
-  // <body>
-  //      <!-- The core Firebase JS SDK is always required and must be listed first -->
-  //         <script src="/__/firebase/7.19.1/firebase-app.js"></script>
 
-  //         <!-- TODO: Add SDKs for Firebase products that you want to use
-  //             https://firebase.google.com/docs/web/setup#available-libraries -->
-
-  //         <!-- Initialize Firebase -->
-  //         <script src="/__/firebase/init.js"></script>
-  // </body>
     )
 };
 

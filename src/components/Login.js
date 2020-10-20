@@ -106,7 +106,7 @@ class Login extends Component {
       //redirects to home page if successful login
       renderRedirect = () => {
         if (this.state.redirect) {
-          return <Redirect to='/' />
+          return <Redirect to='/newest' />
         }
       }
 
